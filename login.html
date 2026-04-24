@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>StudentFlow - Todo List Mahasiswa</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========== VIEW MANAGEMENT ========== */
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ========== LOGIN PAGE STYLES ========== */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-page::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+        }
+
+        .login-page::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            max-width: 1100px;
+            width: 100%;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+
+        .login-left {
+            flex: 1;
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-left h1 {
+            font-size: 42px;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 20px;
+            animation: slideInLeft 0.6s ease;
+        }
+
+        .login-left p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            animation: slideInLeft 0.6s ease 0.1s backwards;
+        }
+
+        .features-list {
+            list-style: none;
+            animation: slideInLeft 0.6s ease 0.2s backwards;
+        }
+
+        .features-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .features-list li i {
+            width: 24px;
+            font-size: 18px;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 50px;
+            background: white;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .login-icon i {
+            font-size: 35px;
+            color: white;
+        }
+
+        .login-header h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group i.input-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #999;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .demo-info {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* ========== HOME PAGE STYLES ========== */
+        .home-page {
+            min-height: 100vh;
+            background: #f5f7fb;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area i {
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-area h2 {
+            font-size: 22px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0f0f0;
+            padding: 8px 18px;
+            border-radius: 40px;
+        }
+
+        .user-badge i {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .user-badge span {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid #e0e0e0;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-logout:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 25px 30px;
+            padding: 30px;
+            border-radius: 24px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            opacity: 0.9;
+        }
+
+        .welcome-stats {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .welcome-stats .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            padding: 0 30px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-info h4 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            padding: 0 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            border: none;
+            background: white;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.05);
+        }
+
+        /* Todo Columns */
+        .todo-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            padding: 0 30px 30px;
+        }
+
+        .todo-column {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .column-header {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .column-header h3 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .column-header h3 i {
+            font-size: 20px;
+        }
+
+        .task-count {
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .tasks-list {
+            max-height: 550px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(3px);
+        }
+
+        .task-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .priority-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .priority-tinggi {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-sedang {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-rendah {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .task-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+
+        .task-meta i {
+            margin-right: 4px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-complete {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 28px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            padding: 10px 24px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-left {
+                padding: 30px;
+                text-align: center;
+            }
+
+            .features-list li {
+                justify-content: center;
+            }
+
+            .todo-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="view active">
+        <div class="login-page">
+            <div class="login-container">
+                <div class="login-left">
+                    <h1>StudentFlow</h1>
+                    <p>Platform manajemen tugas mahasiswa yang membantu Anda tetap terorganisir dan produktif setiap
+                        hari.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Kelola semua tugas kuliah</li>
+                        <li><i class="fas fa-chart-line"></i> Pantau progress belajar</li>
+                        <li><i class="fas fa-bell"></i> Notifikasi deadline</li>
+                        <li><i class="fas fa-mobile-alt"></i> Akses di mana saja</li>
+                    </ul>
+                </div>
+                <div class="login-right">
+                    <div class="login-header">
+                        <div class="login-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h2>Selamat Datang!</h2>
+                        <p>Masuk untuk melanjutkan</p>
+                    </div>
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <label>Email Mahasiswa</label>
+                            <input type="email" id="loginEmail" placeholder="contoh@student.ac.id" required>
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" id="loginPassword" placeholder="Minimal 4 karakter" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox"> Ingat saya
+                            </label>
+                            <a href="#" class="forgot-link">Lupa password?</a>
+                        </div>
+                        <button type="submit" class="btn-login">
+                            <span>Masuk Dashboard</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <div id="loginError" class="error-message" style="display: none;"></div>
+                    </form>
+                    <div class="demo-info">
+                        <i class="fas fa-info-circle"></i> Demo: gunakan email apapun & password minimal 4 karakter
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME VIEW -->
+    <div id="homeView" class="view">
+        <div class="home-page">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="logo-area">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h2>StudentFlow</h2>
+                </div>
+                <div class="user-section">
+                    <div class="user-badge">
+                        <i class="fas fa-user-graduate"></i>
+                        <span id="userEmailDisplay">user@example.com</span>
+                    </div>
+                    <button class="btn-logout" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h3>Halo, <span id="welcomeName">Mahasiswa</span>! 👋</h3>
+                    <p>Semangat mengerjakan tugas kuliah hari ini. Jangan lupa istirahat ya!</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="number" id="todayComplete">0</div>
+                    <div>Tugas Selesai Hari Ini</div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4 id="totalTasks">0</h4>
+                        <p>Total Tugas</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4 id="pendingTasks">0</h4>
+                        <p>Belum Selesai</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h4 id="completedTasks">0</h4>
+                        <p>Selesai</p>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Semua</button>
+                    <button class="filter-btn" data-filter="pending">Belum Selesai</button>
+                    <button class="filter-btn" data-filter="completed">Selesai</button>
+                </div>
+                <button class="btn-add" id="addTaskBtn">
+                    <i class="fas fa-plus"></i> Tugas Baru
+                </button>
+            </div>
+
+            <!-- Todo Columns -->
+            <div class="todo-columns">
+                <!-- Pending Column -->
+                <div class="todo-column">
+                    <div class="column-header">
+                        <h3><i class="fas fa-clock"></i> Belum Selesai</h3>
+                        <span class="task-count" id="pendingCount">0</span>
+                    </div>
+                    <div class="tasks-list" id="pendingTasksList">
+                        <div class="empty-state">
+                            <i class="fas fa-smile-wink"></i>
+                            <p>Tidak ada tugas tertunda</p>
+                            <small>Yuk tambah tugas baru!</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Column -->
+                <div class="todo-column">
+                    <div class="column-header">
+                        <h3><i class="fas fa-check-circle"></i> Selesai</h3>
+                        <span class="task-count" id="completedCount">0</span>
+                    </div>
+                    <div class="tasks-list" id="completedTasksList">
+                        <div class="empty-state">
+                            <i class="fas fa-trophy"></i>
+                            <p>Belum ada tugas selesai</p>
+                            <small>Semangat selesaikan tugasmu!</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> <span id="modalTitle">Tambah Tugas Baru</span></h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    <div class="form-group">
+                        <label>Judul Tugas <span class="required">*</span></label>
+                        <input type="text" id="taskTitle" placeholder="Contoh: Tugas Akhir AI" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea id="taskDesc" rows="3"
+                            placeholder="Detail tugas, link referensi, catatan..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mata Kuliah</label>
+                            <select id="taskCategory">
+                                <option value="Umum">📚 Umum</option>
+                                <option value="Pemrograman">💻 Pemrograman</option>
+                                <option value="Matematika">📐 Matematika</option>
+                                <option value="Bahasa">🌍 Bahasa</option>
+                                <option value="Proyek">🚀 Proyek Akhir</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Prioritas</label>
+                            <select id="taskPriority">
+                                <option value="Rendah">🟢 Rendah</option>
+                                <option value="Sedang" selected>🟡 Sedang</option>
+                                <option value="Tinggi">🔴 Tinggi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel" id="cancelModalBtn">Batal</button>
+                        <button type="submit" class="btn-save">Simpan Tugas</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Management
+        let currentUser = null;
+        let tasks = [];
+        let currentFilter = 'all';
+
+        // DOM Elements
+        const loginView = document.getElementById('loginView');
+        const homeView = document.getElementById('homeView');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskModal = document.getElementById('taskModal');
+        const taskForm = document.getElementById('taskForm');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+
+        // Helper Functions
+        function togglePassword() {
+            const passwordInput = document.getElementById('loginPassword');
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        }
+
+        function saveTasks() {
+            if (currentUser) {
+                localStorage.setItem(`tasks_${currentUser}`, JSON.stringify(tasks));
+            }
+        }
+
+        function loadTasks() {
+            if (currentUser) {
+                const stored = localStorage.getItem(`tasks_${currentUser}`);
+                if (stored) {
+                    tasks = JSON.parse(stored);
+                } else {
+                    // Sample data
+                    tasks = [
+                        { id: Date.now() + 1, title: "Mengerjakan Tugas AI", description: "Buat model klasifikasi dengan dataset MNIST", category: "Pemrograman", priority: "Tinggi", completed: false, createdAt: new Date().toISOString() },
+                        { id: Date.now() + 2, title: "Presentasi Kelompok Pancasila", description: "Slide dan makalah, Rabu depan", category: "Umum", priority: "Sedang", completed: false, createdAt: new Date().toISOString() },
+                        { id: Date.now() + 3, title: "Submit Essay Bahasa Inggris", description: "Tema lingkungan", category: "Bahasa", priority: "Sedang", completed: true, createdAt: new Date().toISOString() }
+                    ];
+                    saveTasks();
+                }
+            }
+        }
+
+        function renderTasks() {
+            if (!currentUser) return;
+
+            let filteredTasks = tasks;
+            if (currentFilter === 'pending') {
+                filteredTasks = tasks.filter(t => !t.completed);
+            } else if (currentFilter === 'completed') {
+                filteredTasks = tasks.filter(t => t.completed);
+            }
+
+            const pendingTasks = filteredTasks.filter(t => !t.completed);
+            const completedTasks = filteredTasks.filter(t => t.completed);
+
+            // Update counts
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('pendingTasks').textContent = tasks.filter(t => !t.completed).length;
+            document.getElementById('completedTasks').textContent = tasks.filter(t => t.completed).length;
+            document.getElementById('pendingCount').textContent = pendingTasks.length;
+            document.getElementById('completedCount').textContent = completedTasks.length;
+
+            // Today's completed tasks
+            const today = new Date().toDateString();
+            const todayComplete = tasks.filter(t => t.completed && new Date(t.updatedAt || t.createdAt).toDateString() === today).length;
+            document.getElementById('todayComplete').textContent = todayComplete;
+
+            // Render pending tasks
+            const pendingContainer = document.getElementById('pendingTasksList');
+            if (pendingTasks.length === 0) {
+                pendingContainer.innerHTML = '<div class="empty-state"><i class="fas fa-smile-wink"></i><p>Tidak ada tugas tertunda</p><small>Yuk tambah tugas baru!</small></div>';
+            } else {
+                pendingContainer.innerHTML = pendingTasks.map(task => `
+                    <div class="task-card">
+                        <div class="task-title">
+                            ${escapeHtml(task.title)}
+                            <span class="priority-badge priority-${task.priority.toLowerCase()}">${task.priority}</span>
+                        </div>
+                        <div class="task-desc">${escapeHtml(task.description || 'Tidak ada deskripsi')}</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-book"></i> ${task.category}</span>
+                            <span><i class="far fa-calendar"></i> ${formatDate(task.createdAt)}</span>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn-complete" onclick="completeTask(${task.id})"><i class="fas fa-check"></i> Selesai</button>
+                            <button class="btn-edit" onclick="editTask(${task.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn-delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash"></i> Hapus</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render completed tasks
+            const completedContainer = document.getElementById('completedTasksList');
+            if (completedTasks.length === 0) {
+                completedContainer.innerHTML = '<div class="empty-state"><i class="fas fa-trophy"></i><p>Belum ada tugas selesai</p><small>Semangat selesaikan tugasmu!</small></div>';
+            } else {
+                completedContainer.innerHTML = completedTasks.map(task => `
+                    <div class="task-card">
+                        <div class="task-title">
+                            ${escapeHtml(task.title)}
+                            <span class="priority-badge priority-${task.priority.toLowerCase()}">${task.priority}</span>
+                        </div>
+                        <div class="task-desc">${escapeHtml(task.description || 'Tidak ada deskripsi')}</div>
+                        <div class="task-meta">
+                            <span><i class="fas fa-book"></i> ${task.category}</span>
+                            <span><i class="far fa-calendar"></i> ${formatDate(task.createdAt)}</span>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn-edit" onclick="editTask(${task.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn-delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash"></i> Hapus</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return 'Baru';
+            const date = new Date(isoString);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        }
+
+        function completeTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = true;
+                task.updatedAt = new Date().toISOString();
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('Yakin ingin menghapus tugas ini?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        function editTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                document.getElementById('modalTitle').textContent = 'Edit Tugas';
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskDesc').value = task.description || '';
+                document.getElementById('taskCategory').value = task.category;
+                document.getElementById('taskPriority').value = task.priority;
+                taskModal.classList.add('active');
+            }
+        }
+
+        // Login handler
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !email.includes('@') || password.length < 4) {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = 'Email tidak valid atau password minimal 4 karakter';
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 3000);
+                return;
+            }
+
+            currentUser = email;
+            document.getElementById('userEmailDisplay').textContent = email;
+            document.getElementById('welcomeName').textContent = email.split('@')[0];
+
+            loadTasks();
+            renderTasks();
+
+            loginView.classList.remove('active');
+            homeView.classList.add('active');
+        });
+
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            tasks = [];
+            loginView.classList.add('active');
+            homeView.classList.remove('active');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        });
+
+        // Add task button
+        addTaskBtn.addEventListener('click', () => {
+            document.getElementById('modalTitle').textContent = 'Tambah Tugas Baru';
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskId').value = '';
+            taskModal.classList.add('active');
+        });
+
+        // Close modal
+        function closeModal() {
+            taskModal.classList.remove('active');
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (e) => {
+            if (e.target === taskModal) closeModal();
+        });
+
+        // Task form submit
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('taskId').value;
+            const title = document.getElementById('taskTitle').value.trim();
+            if (!title) {
+                alert('Judul tugas wajib diisi!');
+                return;
+            }
+
+            const taskData = {
+                title: title,
+                description: document.getElementById('taskDesc').value,
+                category: document.getElementById('taskCategory').value,
+                priority: document.getElementById('taskPriority').value,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (id) {
+                const index = tasks.findIndex(t => t.id == id);
+                if (index !== -1) {
+                    tasks[index] = { ...tasks[index], ...taskData };
+                }
+            } else {
+                taskData.id = Date.now();
+                taskData.completed = false;
+                taskData.createdAt = new Date().toISOString();
+                tasks.unshift(taskData);
+            }
+
+            saveTasks();
+            renderTasks();
+            closeModal();
+        });
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                renderTasks();
+            });
+        });
+    </script>
+</body>
+</html>
